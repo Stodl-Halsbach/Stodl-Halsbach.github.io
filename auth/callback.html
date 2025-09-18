@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anmeldung läuft…</title>
+</head>
+<body>
+  <p>Bitte einen Moment…</p>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // TODO: Ersetzen
+    const SUPABASE_URL = 'https://<dein-project>.supabase.co'
+    const SUPABASE_ANON_KEY = '<dein-anon-key>'
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    ;(async () => {
+      try {
+        // Liest den Token aus der URL und speichert die Session
+        await supabase.auth.getSessionFromUrl({ storeSession: true })
+
+        // Weiterleitung nach erfolgreichem Login (zielseite anpassen)
+        window.location.replace('/index.html')
+      } catch (e) {
+        console.error(e)
+        document.body.innerHTML = '<h1>Ups, Auth fehlgeschlagen.</h1><p>Bitte Link erneut öffnen.</p>'
+      }
+    })()
+  </script>
+</body>
+</html>
