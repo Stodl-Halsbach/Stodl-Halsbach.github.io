@@ -16,33 +16,43 @@
   
     (async () => {
       try {
-        const hasCode = location.search.includes('code=');
-        const hasHash = location.hash.includes('access_token');
-  
-        if (hasCode) {
-          const { error } = await supabase.auth.exchangeCodeForSession(location.href);
-          if (error) throw error;
-        } else if (hasHash) {
-          const frag = new URLSearchParams(location.hash.slice(1));
-          const access_token = frag.get('access_token');
-          const refresh_token = frag.get('refresh_token');
-          if (!access_token || !refresh_token) {
-            throw new Error('Token im Fragment unvollständig.');
-          }
-          const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-          if (error) throw error;
-        } else {
-          throw new Error('Kein Auth-Token in der URL gefunden.');
-        }
-  
-        window.location.replace('/index.html');
-      } catch (e) {
-        console.error('Auth-Fehler:', e);
-        document.body.innerHTML = `
-          <h1>Ups, Anmeldung fehlgeschlagen</h1>
-          <p>${e.message ?? e}</p>
-          <p>Bitte neuen Einladungslink öffnen.</p>`;
+      console.log('[CB] href:', location.href);
+      console.log('[CB] search:', location.search);
+      console.log('[CB] hash:', location.hash);
+
+      const hasCode = location.search.includes('code=');
+      const hasHash = location.hash.includes('access_token');
+
+      if (hasCode) {
+        console.log('[CB] using exchangeCodeForSession');
+        const { data, error } = await supabase.auth.exchangeCodeForSession(location.href);
+        console.log('[CB] exchange result:', { data, error });
+        if (error) throw error;
+      } else if (hasHash) {
+        console.log('[CB] using setSession from hash');
+        const frag = new URLSearchParams(location.hash.slice(1));
+        const access_token = frag.get('access_token');
+        const refresh_token = frag.get('refresh_token');
+        console.log('[CB] tokens present:', !!access_token, !!refresh_token);
+        if (!access_token || !refresh_token) throw new Error('Token im Fragment unvollständig.');
+        const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+        console.log('[CB] setSession result:', { data, error });
+        if (error) throw error;
+      } else {
+        throw new Error('Kein Auth-Token in der URL gefunden (weder ?code noch #access_token).');
       }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[CB] session after auth:', session);
+      if (!session) throw new Error('Session konnte nicht gespeichert werden.');
+      window.location.replace('/index.html');
+    } catch (e) {
+      console.error('Auth-Fehler:', e);
+      document.body.innerHTML = `
+        <h1>Ups, Anmeldung fehlgeschlagen</h1>
+        <pre style="white-space:pre-wrap">${e?.message || e}</pre>
+        <p>Bitte neuen Einladungslink öffnen.</p>`;
+    }
     })();
   </script>
 </body>
