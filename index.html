@@ -6,6 +6,12 @@
   <title>Meine Seite</title>
 </head>
 <body>
+  <script>
+    (function () {
+      const hasToken = location.hash.includes('access_token') || location.search.includes('code=');
+      if (hasToken) location.replace('/auth/callback.html' + location.search + location.hash);
+    })();
+  </script>
   <h1>Hallo 👋</h1>
   <p>Diese Seite liegt auf GitHub Pages unter meiner Domain.</p>
   <p><a href="/auth/callback.html">Auth-Callback testen</a></p>
