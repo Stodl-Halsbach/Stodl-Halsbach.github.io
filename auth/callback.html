@@ -45,7 +45,7 @@
       const { data: { session } } = await supabase.auth.getSession();
       console.log('[CB] session after auth:', session);
       if (!session) throw new Error('Session konnte nicht gespeichert werden.');
-      window.location.replace('/index.html');
+      window.location.replace('/auth/set-password.html');
     } catch (e) {
       console.error('Auth-Fehler:', e);
       document.body.innerHTML = `
