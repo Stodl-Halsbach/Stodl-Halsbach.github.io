@@ -7,18 +7,6 @@
 </head>
 <body>
   <p>Bitte einen Moment…</p>
-  <script>
-    (function () {
-      console.log('Callback URL:', location.href);
-  
-      const hasTokenOnRoot = (location.pathname === '/' || location.pathname === '/index.html') &&
-        (location.hash.includes('access_token') || location.search.includes('code='));
-      if (hasTokenOnRoot) {
-        location.replace('/auth/callback.html' + location.search + location.hash);
-      }
-    })();
-  </script>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://ccdmkvidlsaqidskdgcd.supabase.co';
@@ -28,12 +16,20 @@
   
     (async () => {
       try {
-        if (location.search.includes('code=')) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(location.href);
+        const hasCode = location.search.includes('code=');
+        const hasHash = location.hash.includes('access_token');
+  
+        if (hasCode) {
+          const { error } = await supabase.auth.exchangeCodeForSession(location.href);
           if (error) throw error;
-        }
-        else if (location.hash.includes('access_token')) {
-          const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        } else if (hasHash) {
+          const frag = new URLSearchParams(location.hash.slice(1));
+          const access_token = frag.get('access_token');
+          const refresh_token = frag.get('refresh_token');
+          if (!access_token || !refresh_token) {
+            throw new Error('Token im Fragment unvollständig.');
+          }
+          const { error } = await supabase.auth.setSession({ access_token, refresh_token });
           if (error) throw error;
         } else {
           throw new Error('Kein Auth-Token in der URL gefunden.');
@@ -45,7 +41,7 @@
         document.body.innerHTML = `
           <h1>Ups, Anmeldung fehlgeschlagen</h1>
           <p>${e.message ?? e}</p>
-          <p>Bitte neuen Einladungslink anfordern und direkt öffnen.</p>`;
+          <p>Bitte neuen Einladungslink öffnen.</p>`;
       }
     })();
   </script>
