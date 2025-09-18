@@ -14,6 +14,10 @@
     const SUPABASE_URL = 'https://ccdmkvidlsaqidskdgcd.supabase.co'
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZG1rdmlkbHNhcWlkc2tkZ2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDEyOTMsImV4cCI6MjA2NTk3NzI5M30.P5KowUxOMjsqY0SGb04TwGiwhm-H-uaY3NIp67HKbR8'
 
+    console.log('RAW URL:', JSON.stringify(SUPABASE_URL))
+    SUPABASE_URL = SUPABASE_URL.trim()
+    try { new URL(SUPABASE_URL); console.log('URL OK'); } catch (e) { console.error('URL BAD', e) }
+  
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     ;(async () => {
