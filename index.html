@@ -1,19 +1,274 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
+
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Meine Seite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stodl Halsbach</title>
+  <meta name="description" content="Stodl Halsbach – Landing im WinUI‑3‑Look" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@fluentui/web-components@latest"></script>
+  <style>
+    :root {
+      --content-max: 1100px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", Roboto, Ubuntu, sans-serif;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      background: #181818;
+      color: #f3f3f3;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      background: #ffffff;
+      color: #222;
+    }
+
+    fluent-design-system-provider,
+    fluent-card {
+      --accent-fill-rest: #1D4ED8;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid color-mix(in oklab, CanvasText, Canvas 85%);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .5rem 1rem;
+      max-width: var(--content-max);
+      margin: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-weight: 600;
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+    }
+
+    nav {
+      margin-left: auto;
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    main {
+      max-width: var(--content-max);
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-block: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .muted {
+      color: color-mix(in oklab, CanvasText, Canvas 40%);
+    }
+
+    footer {
+      border-top: 1px solid color-mix(in oklab, CanvasText, Canvas 85%);
+      margin-top: 3rem;
+    }
+
+    .footinner {
+      max-width: var(--content-max);
+      margin: auto;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .command-bar {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    fluent-button[appearance="accent"] {
+      --accent-foreground-rest: white;
+    }
+
+    h1 {
+      font-weight: 650;
+      letter-spacing: -.01em;
+    }
+
+    h2 {
+      font-weight: 600;
+      margin-top: 2rem;
+    }
+  </style>
 </head>
+
 <body>
+  <fluent-design-system-provider use-defaults>
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="#2B5DFF" stroke-width="2" fill="none" />
+            <circle cx="12" cy="12" r="3" fill="none" stroke="#2B5DFF" stroke-width="2" />
+          </svg>
+          <span>Stodl Halsbach</span>
+        </div>
+        <nav>
+          <fluent-button appearance="stealth" href="#features">Features</fluent-button>
+          <fluent-button appearance="stealth" href="#docs">Dokumentation</fluent-button>
+          <fluent-divider orientation="vertical"></fluent-divider>
+          <fluent-button id="toggleTheme">Light/Dark</fluent-button>
+          <fluent-button id="loginBtn">Login</fluent-button>
+          <fluent-button id="logoutBtn" appearance="outline" style="display:none;">Logout</fluent-button>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="hero">
+        <div>
+          <h1>Willkommen 👋</h1>
+          <p class="muted">Diese Seite nutzt GitHub Pages, Supabase‑Auth und das WinUI‑3‑ähnliche Fluent‑Design.</p>
+          <div class="command-bar" style="margin-top:1rem;">
+            <fluent-button appearance="accent" id="ctaInvite">Einladung anfordern</fluent-button>
+            <fluent-button appearance="outline" href="#docs">Mehr erfahren</fluent-button>
+          </div>
+          <div id="sessionInfo" class="muted" style="margin-top:.75rem;"></div>
+        </div>
+        <fluent-card>
+          <div style="padding:1rem 1.25rem;">
+            <h3 style="margin-top:0">Schnellzugriff</h3>
+            <fluent-divider></fluent-divider>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; margin-top:1rem;">
+              <fluent-button href="/auth/callback.html" appearance="accent">Auth Callback testen</fluent-button>
+              <fluent-button href="/auth/set-password.html" appearance="outline">Passwort setzen</fluent-button>
+            </div>
+          </div>
+        </fluent-card>
+      </section>
+      <section id="features">
+        <h2>Features</h2>
+        <div class="cards">
+          <fluent-card>
+            <div style="padding:1rem 1.25rem;">
+              <h3 style="margin-top:0">Supabase‑Auth</h3>
+              <p class="muted">Einladungen, Magic Links und Passwort‑Reset. Tokens werden auf der Callback‑Seite
+                verarbeitet.</p>
+            </div>
+          </fluent-card>
+          <fluent-card>
+            <div style="padding:1rem 1.25rem;">
+              <h3 style="margin-top:0">WinUI‑3 Look</h3>
+              <p class="muted">Buttons, Cards, Divider im Fluent‑2‑Stil. Farbakzent: #1D4ED8 (dein Projektblau).</p>
+            </div>
+          </fluent-card>
+          <fluent-card>
+            <div style="padding:1rem 1.25rem;">
+              <h3 style="margin-top:0">Responsiv</h3>
+              <p class="muted">Skaliert auf Desktop, Tablet und Phone. Auto‑Darkmode via System‑Einstellung.</p>
+            </div>
+          </fluent-card>
+        </div>
+      </section>
+      <section id="docs">
+        <h2>Dokumentation</h2>
+        <fluent-card>
+          <div style="padding:1rem 1.25rem; line-height:1.55;">
+            <p>• <strong>Einladung/Callback</strong>: Supabase → Authentication → URL Configuration
+              (<code>Site URL</code> & Redirects) auf diese Domain setzen.<br />• <strong>config.js</strong>: Supabase
+              URL & Anon Key zentral pflegen und vor allen Scripts laden.<br />• <strong>Profile</strong>: Trigger auf
+              <code>auth.users</code> legt <code>public.users</code> an (inkl. <code>org_id</code>, <code>role</code> …)
+              aus <code>raw_user_meta_data</code>.
+            </p>
+          </div>
+        </fluent-card>
+      </section>
+    </main>
+    <footer>
+      <div class="footinner">
+        <span class="muted">© <span id="y"></span> Stodl Halsbach</span>
+        <span class="muted"><a href="#" style="text-decoration:none;">Impressum</a> · <a href="#"
+            style="text-decoration:none;">Datenschutz</a></span>
+      </div>
+    </footer>
+  </fluent-design-system-provider>
+  <script src="/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    (function () {
-      const hasToken = location.hash.includes('access_token') || location.search.includes('code=');
-      if (hasToken) location.replace('/auth/callback.html' + location.search + location.hash);
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const { url, anonKey } = window.SUPABASE_CONFIG || {};
+    const supabase = window.supabase.createClient(url, anonKey);
+
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const s = document.getElementById('sessionInfo');
+      const btnLogin = document.getElementById('loginBtn');
+      const btnLogout = document.getElementById('logoutBtn');
+      if (session?.user) {
+        s.textContent = `Eingeloggt als ${session.user.email}`;
+        btnLogin.style.display = 'none';
+        btnLogout.style.display = '';
+      } else {
+        s.textContent = 'Nicht eingeloggt.';
+        btnLogin.style.display = '';
+        btnLogout.style.display = 'none';
+      }
+      btnLogin?.addEventListener('click', () => { location.href = '/auth/callback.html'; });
+      btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+      supabase.auth.onAuthStateChange((_e, sess) => { if (sess?.user) location.reload(); });
     })();
+
+    // Theme toggle
+    const btnToggle = document.getElementById('toggleTheme');
+    btnToggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    });
   </script>
-  <h1>Hallo 👋</h1>
-  <p>Diese Seite liegt auf GitHub Pages unter meiner Domain.</p>
-  <p><a href="/auth/callback.html">Auth-Callback testen</a></p>
 </body>
+
 </html>
