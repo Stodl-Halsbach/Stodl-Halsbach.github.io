@@ -1,59 +1,121 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Anmeldung läuft…</title>
+  <title>Anmeldung bestätigen</title>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@fluentui/web-components@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, "Segoe UI Variable", sans-serif;
+      background: #181818;
+      color: #f3f3f3;
+    }
+
+    [data-theme="light"] {
+      background: #fff;
+      color: #222;
+    }
+
+    header {
+      border-bottom: 1px solid color-mix(in oklab, CanvasText, Canvas 85%);
+      padding: .5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    fluent-design-system-provider {
+      --accent-fill-rest: #1D4ED8;
+    }
+
+    .center {
+      display: grid;
+      place-items: center;
+      gap: .5rem;
+      min-height: 30vh;
+    }
+
+    .actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
+
 <body>
-  <p>Bitte einen Moment…</p>
-  
+  <fluent-design-system-provider use-defaults>
+    <header>
+      <div class="brand">🔑 Anmeldung</div>
+      <fluent-button id="toggleTheme">Light/Dark</fluent-button>
+    </header>
+    <main>
+      <h1>Anmeldung wird abgeschlossen…</h1>
+      <fluent-card>
+        <div style="padding:1rem 1.25rem;">
+          <div id="loading" class="center">
+            <fluent-progress-ring></fluent-progress-ring>
+            <p>Bitte einen Moment…</p>
+          </div>
+          <div id="success" style="display:none;">
+            <fluent-alert appearance="accent">Anmeldung erfolgreich 🎉</fluent-alert>
+            <p id="userLine" style="margin-top:.5rem;"></p>
+            <div class="actions">
+              <fluent-button appearance="accent" href="/">Zur Startseite</fluent-button>
+              <fluent-button appearance="outline" href="/auth/set-password.html">Passwort setzen</fluent-button>
+            </div>
+          </div>
+          <div id="error" style="display:none;">
+            <fluent-alert appearance="error">Ups – Anmeldung fehlgeschlagen</fluent-alert>
+            <pre id="errMsg" style="white-space:pre-wrap;margin-top:.5rem;"></pre>
+            <fluent-button href="/" appearance="outline">Zur Startseite</fluent-button>
+          </div>
+        </div>
+      </fluent-card>
+    </main>
+  </fluent-design-system-provider>
+
   <script src="/config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const { url, anonKey } = window.SUPABASE_CONFIG;
+    const { url, anonKey } = window.SUPABASE_CONFIG || {};
     const supabase = window.supabase.createClient(url, anonKey);
-  
+    const $ = id => document.getElementById(id);
+    const show = id => ($(id).style.display = ''); const hide = id => ($(id).style.display = 'none');
+
     (async () => {
       try {
-      console.log('[CB] href:', location.href);
-      console.log('[CB] search:', location.search);
-      console.log('[CB] hash:', location.hash);
-
-      const hasCode = location.search.includes('code=');
-      const hasHash = location.hash.includes('access_token');
-
-      if (hasCode) {
-        console.log('[CB] using exchangeCodeForSession');
-        const { data, error } = await supabase.auth.exchangeCodeForSession(location.href);
-        console.log('[CB] exchange result:', { data, error });
-        if (error) throw error;
-      } else if (hasHash) {
-        console.log('[CB] using setSession from hash');
-        const frag = new URLSearchParams(location.hash.slice(1));
-        const access_token = frag.get('access_token');
-        const refresh_token = frag.get('refresh_token');
-        console.log('[CB] tokens present:', !!access_token, !!refresh_token);
-        if (!access_token || !refresh_token) throw new Error('Token im Fragment unvollständig.');
-        const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
-        console.log('[CB] setSession result:', { data, error });
-        if (error) throw error;
-      } else {
-        throw new Error('Kein Auth-Token in der URL gefunden (weder ?code noch #access_token).');
+        if (location.search.includes('code=')) {
+          const { error } = await supabase.auth.exchangeCodeForSession(location.href);
+          if (error) throw error;
+        } else if (location.hash.includes('access_token')) {
+          const f = new URLSearchParams(location.hash.slice(1));
+          const { error } = await supabase.auth.setSession({ access_token: f.get('access_token'), refresh_token: f.get('refresh_token') });
+          if (error) throw error;
+        } else throw new Error("Kein Token in URL gefunden.");
+        const { data: { user } } = await supabase.auth.getUser();
+        hide('loading'); show('success');
+        $('userLine').textContent = `Eingeloggt als ${user?.email || ''}`;
+      } catch (e) {
+        hide('loading'); show('error');
+        $('errMsg').textContent = e.message || String(e);
       }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('[CB] session after auth:', session);
-      if (!session) throw new Error('Session konnte nicht gespeichert werden.');
-      window.location.replace('/auth/set-password.html');
-    } catch (e) {
-      console.error('Auth-Fehler:', e);
-      document.body.innerHTML = `
-        <h1>Ups, Anmeldung fehlgeschlagen</h1>
-        <pre style="white-space:pre-wrap">${e?.message || e}</pre>
-        <p>Bitte neuen Einladungslink öffnen.</p>`;
-    }
     })();
+
+    document.getElementById('toggleTheme').onclick = () => {
+      document.documentElement.dataset.theme =
+        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    };
   </script>
 </body>
+
 </html>
