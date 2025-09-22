@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Weiterleitung …</title>
+
+    <meta http-equiv="refresh" content="0; url=/auth/callback.html">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            background: #0f1420;
+            color: #e7eaf1;
+        }
+
+        a {
+            color: #1D4ED8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <p>Du wirst weitergeleitet …<br>
+        Falls nichts passiert, <a href="/auth/callback.html">hier klicken</a>.</p>
+
+    <script>
+        window.location.replace("/auth/callback.html");
+    </script>
+</body>
+
+</html>
